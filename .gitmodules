@@ -8,3 +8,11 @@
 [submodule "pybind11_json"]
 	path = pybind11_json
 	url = https://github.com/pybind/pybind11_json.git
+[submodule "dechiffrage_component/micro-ecc"]
+	path = dechiffrage_component/micro-ecc
+	url = https://github.com/jluuM2/micro-ecc
+	branch = master
+[submodule "dechiffrage_component/conv-string-bin"]
+	path = dechiffrage_component/conv-string-bin
+	url = https://github.com/jluuM2/Conversion_String_binaire
+	branch = main
