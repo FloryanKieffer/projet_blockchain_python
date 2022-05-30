@@ -83,7 +83,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(chiffrage_component,greetings)
 {
-  	greetings.doc() = "chiffrage_cle 1.0";
+  	greetings.doc() = "chiffrage_component 1.0";
     	py::class_<Chiffrage>(greetings, "Chiffrage", py::dynamic_attr())
         	.def(py::init())
         	.def("initialize", &Cle::initialize)
