@@ -9,6 +9,8 @@
 #include "cryptopp/osrng.h"
 #include "cryptopp/aes.h"
 #include "cryptopp/hex.h"
+#include "cryptopp/integer.h"
+#include "cryptopp/oids.h"
 #include <iostream>
 uint8_t hexchr2bin(const char hex)
 {
@@ -108,8 +110,8 @@ class Chiffrage
         		//get point on the used curve
         		ECP::Point point;
         		encryptor.GetKey().GetGroupParameters().GetCurve().DecodePoint(point, ss, ss.MaxRetrievable());
-        		cout << "X: " << std::hex << point.x << endl;
-        		cout << "Y: " << std::hex << point.y << endl;
+        		std::cout << "X: " << std::hex << point.x << std::endl;
+        		std::cout << "Y: " << std::hex << point.y << std::endl;
 
         		//set encryptor's public element
         		encryptor.AccessKey().SetPublicElement(point);
@@ -119,10 +121,10 @@ class Chiffrage
 
         		// encrypted message
         		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor, new StringSink(encryptedMessage) ) );
-        		cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<endl;
+        		std::cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<std::endl;
     		}
     		catch(const CryptoPP::Exception& ex){
-        		std::cerr << ex.what() << endl;
+        		std::cerr << ex.what() << std::endl;
     		}
 
     		return encryptedMessage;
