@@ -4,7 +4,7 @@ LIBS=-lpython3.7m
 COMPOSANT = chiffrage_component
 
 LIBSO = ${COMPOSANT}.so
-LIBSO_OBJS = ${COMPOSANT}.o micro-ecc/uECC.o
+LIBSO_OBJS = ${COMPOSANT}.o micro-ecc/uECC.o cryptopp/eccrypto.o cryptopp/base64.o cryptopp/filters.o cryptopp/rsa.o cryptopp/cryptlib.o cryptopp/poly1305.o cryptopp/osrng.o cryptopp/aes.o cryptopp/hex.o cryptopp/integer.o cryptopp/oids.o 
 
 include ../gcc.mk
 include ../pybind11.mk
