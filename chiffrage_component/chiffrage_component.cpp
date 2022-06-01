@@ -1,5 +1,14 @@
 #include <pybind11/pybind11.h>
 #include "micro-ecc/uECC.h"
+#include "cryptopp/eccrypto.h"
+#include "cryptopp/base64.h"
+#include "cryptopp/filters.h"
+#include "cryptopp/rsa.h"
+#include "cryptopp/cryptlib.h"
+#include "cryptopp/poly1305.h"
+#include "cryptopp/osrng.h"
+#include "cryptopp/aes.h"
+#include "cryptopp/hex.h"
 #include <iostream>
 uint8_t hexchr2bin(const char hex)
 {
@@ -48,6 +57,8 @@ class Chiffrage
 	private:
 		std::string PrivateKey;
 		std::string PublicKey;
+		std::string plaintext;
+		std::string encryptedtext;
     	public:
         	Chiffrage(){}
         	~Chiffrage(){} 
@@ -76,6 +87,46 @@ class Chiffrage
 		std::cout<<"PrivateKey : "<<getPrivateKey()<<"\n";
        		std::cout<<"PublicKey : "<<getPublicKey()<<"\n";
 	}
+
+	std::string encrypt(std::string message ,  std::string  compressedPublicKeyPoint){
+    		using namespace CryptoPP;
+		std::string encryptedMessage;
+    		try{
+        		AutoSeededRandomPool prng;
+
+        		//public key is a point consisting of "public key point x" and "public key point y"
+        		//compressed public key also known as "public-point" formed using point-compression of public key
+
+
+        		//since the key is in base-64 format use Base64Decoder
+        		StringSource ss(compressedPublicKeyPoint, true, new CryptoPP::Base64Decoder);
+     			ECIES<ECP>::Encryptor encryptor;
+
+        		//curve used is secp256k1
+        		encryptor.AccessKey().AccessGroupParameters().Initialize(ASN1::secp256k1());
+
+        		//get point on the used curve
+        		ECP::Point point;
+        		encryptor.GetKey().GetGroupParameters().GetCurve().DecodePoint(point, ss, ss.MaxRetrievable());
+        		cout << "X: " << std::hex << point.x << endl;
+        		cout << "Y: " << std::hex << point.y << endl;
+
+        		//set encryptor's public element
+        		encryptor.AccessKey().SetPublicElement(point);
+
+        		//check whether the encryptor's access key thus formed is valid or not
+        		encryptor.AccessKey().ThrowIfInvalid(prng, 3);
+
+        		// encrypted message
+        		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor, new StringSink(encryptedMessage) ) );
+        		cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<endl;
+    		}
+    		catch(const CryptoPP::Exception& ex){
+        		std::cerr << ex.what() << endl;
+    		}
+
+    		return encryptedMessage;
+	}
 };
  
 namespace py = pybind11;
@@ -86,8 +137,9 @@ PYBIND11_MODULE(chiffrage_component,greetings)
   	greetings.doc() = "chiffrage_component 1.0";
     	py::class_<Chiffrage>(greetings, "Chiffrage", py::dynamic_attr())
         	.def(py::init())
-        	.def("initialize", &Cle::initialize)
-        	.def("getPrivateKey", &Cle::getPrivateKey)
-        	.def("getPublicKey", &Cle::getPublicKey)
-		.def("showBothKeys", &Cle::showBothKeys);
+        	.def("initialize", &Chiffrage::initialize)
+        	.def("getPrivateKey", &Chiffrage::getPrivateKey)
+        	.def("getPublicKey", &Chiffrage::getPublicKey)
+		.def("encrypt", &Chiffrage::encrypt)
+		.def("showBothKeys", &Chiffrage::showBothKeys);
 }
