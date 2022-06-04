@@ -12,6 +12,7 @@
 #include "cryptopp/integer.h"
 #include "cryptopp/oids.h"
 #include <iostream>
+
 uint8_t hexchr2bin(const char hex)
 {
 	uint8_t result;
@@ -129,6 +130,36 @@ class Chiffrage
 
     		return encryptedMessage;
 	}
+	//const void encrypt_decrypt(std::string plaintext){
+		//using namespace CryptoPP;
+		//ECIES<ECP>::PrivateKey privateKey;
+		//ECIES<ECP>::PublicKey publicKey;
+		//AutoSeededRandomPool rng;
+
+		// Curve Key Generation
+		//privateKey.Initialize( rng, ASN1::secp256k1());
+		//privateKey.MakePublicKey( publicKey );
+
+		// Encryptor and Decryptor
+		//ECIES<ECP>::Encryptor encryptor( publicKey );
+		//ECIES<ECP>::Decryptor decryptor( privateKey );
+
+		// Message
+		//std::string plainText = plaintext;
+		//int plainTextLength = plainText.length();
+		//std::string cipherText = plaintext;
+		//int cipherTextLength = cipherText.length();
+		// Encryption
+		//encryptor.Encrypt( rng, reinterpret_cast<const byte*>(plainText.c_str()), plainTextLength, cipherText);
+
+		// Decryption
+		//DecodingResult result = decryptor.Decrypt( rng, cipherText, cipherTextLength, reinterpret_cast<byte*>(recoveredText));
+
+		// Crypto++ Test
+		//if( false == result.isValidCoding ) {
+    		//throw std::runtime_error("Crypto++: decryption failed");
+		//}
+	//}
 };
  
 namespace py = pybind11;
@@ -143,5 +174,6 @@ PYBIND11_MODULE(chiffrage_component,greetings)
         	.def("getPrivateKey", &Chiffrage::getPrivateKey)
         	.def("getPublicKey", &Chiffrage::getPublicKey)
 		.def("encrypt", &Chiffrage::encrypt)
+		//.def("encrypt_decrypt", &Chiffrage::encrypt_decrypt)
 		.def("showBothKeys", &Chiffrage::showBothKeys);
 }
