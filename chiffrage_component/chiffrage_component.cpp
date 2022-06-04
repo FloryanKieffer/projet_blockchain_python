@@ -160,6 +160,32 @@ class Chiffrage
     		//throw std::runtime_error("Crypto++: decryption failed");
 		//}
 	//}
+
+	void encrypt_decrypt2(){
+		using namespace CryptoPP;
+    		AutoSeededRandomPool prng;
+   		std::string message= "Now is the time for all good men to come to the aide of their country."; 
+    		/////////////////////////////////////////////////
+    		// Part one - generate keys
+    
+    		ECIES<ECP>::Decryptor d0(prng, ASN1::secp256k1());
+    		//PrintPrivateKey(d0.GetKey());
+
+    		ECIES<ECP>::Encryptor e0(d0);
+    		//PrintPublicKey(e0.GetKey());
+    
+    		/////////////////////////////////////////////////
+    		// Part two - encrypt/decrypt with e0/d0
+    
+    		std::string em0; // encrypted message
+    		StringSource ss1 (message, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0) ) );
+    		std::string dm0; // decrypted message
+    		StringSource ss2 (em0, true, new PK_DecryptorFilter(prng, d0, new StringSink(dm0) ) );
+    
+    		std::cout << "Encrypted Message : "<< em0 << std::endl;
+    		std::cout << "Decrypted Message : "<< dm0 << std::endl;
+	}
+
 };
  
 namespace py = pybind11;
@@ -174,6 +200,9 @@ PYBIND11_MODULE(chiffrage_component,greetings)
         	.def("getPrivateKey", &Chiffrage::getPrivateKey)
         	.def("getPublicKey", &Chiffrage::getPublicKey)
 		.def("encrypt", &Chiffrage::encrypt)
+		.def("encrypt_decrypt2", &Chiffrage::encrypt_decrypt2)
+		//.def("PrintPrivateKey",&Chiffrage::PrintPrivateKey)
+		//.def("PrintPublicKey", &Chiffrage::PrintPublicKey)
 		//.def("encrypt_decrypt", &Chiffrage::encrypt_decrypt)
 		.def("showBothKeys", &Chiffrage::showBothKeys);
 }
