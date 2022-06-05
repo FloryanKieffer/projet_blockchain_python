@@ -91,28 +91,39 @@ class Chiffrage
        		std::cout<<"PublicKey : "<<getPublicKey()<<"\n";
 	}
 
-	std::string encrypt(std::string message ,  std::string  compressedPublicKeyPoint){
+	std::string encrypt(std::string message){
     		using namespace CryptoPP;
 		std::string encryptedMessage;
     		try{
         		AutoSeededRandomPool prng;
+			ECIES<ECP>::Decryptor decryptor;
+			decryptor.AccessKey().Initialize(prng, ASN1::secp256k1());
 
         		//public key is a point consisting of "public key point x" and "public key point y"
         		//compressed public key also known as "public-point" formed using point-compression of public key
 
 
         		//since the key is in base-64 format use Base64Decoder
-        		StringSource ss(compressedPublicKeyPoint, true, new CryptoPP::Base64Decoder);
-     			ECIES<ECP>::Encryptor encryptor;
+			ECIES<ECP>::Encryptor encryptor(decryptor);
+			encryptor.AccessKey().AccessGroupParameters().SetPointCompression(true);
+			std::string compressedPublicKeyPoint;
+			encryptor.GetKey().Save(StringSink(compressedPublicKeyPoint).Ref());
+        		std::string s3;
+			StringSource ss3(compressedPublicKeyPoint, true, new HexEncoder(new StringSink(s3)));
+			std::cout << "compressedPublicKeyPoint : " << s3 << std::endl;
+			StringSource ss(compressedPublicKeyPoint, true, new CryptoPP::Base64Decoder);
 
         		//curve used is secp256k1
         		encryptor.AccessKey().AccessGroupParameters().Initialize(ASN1::secp256k1());
 
         		//get point on the used curve
-        		ECP::Point point;
-        		encryptor.GetKey().GetGroupParameters().GetCurve().DecodePoint(point, ss, ss.MaxRetrievable());
-        		std::cout << "X: " << std::hex << point.x << std::endl;
-        		std::cout << "Y: " << std::hex << point.y << std::endl;
+        		const ECP::Point point = encryptor.GetKey().GetPublicElement();
+			const Integer point_x = point.x;
+			const Integer point_y = point.y;
+			//ECP::Point point;
+        		//encryptor.GetKey().GetGroupParameters().GetCurve().DecodePoint(point, ss, ss.MaxRetrievable());
+        		std::cout << "X: " << std::hex << point_x << std::endl;
+        		std::cout << "Y: " << std::hex << point_y << std::endl;
 
         		//set encryptor's public element
         		encryptor.AccessKey().SetPublicElement(point);
@@ -121,8 +132,8 @@ class Chiffrage
         		encryptor.AccessKey().ThrowIfInvalid(prng, 3);
 
         		// encrypted message
-        		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor, new StringSink(encryptedMessage) ) );
-        		std::cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<std::endl;
+        		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor, new HexEncoder(new StringSink(encryptedMessage))));
+			std::cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<std::endl;
     		}
     		catch(const CryptoPP::Exception& ex){
         		std::cerr << ex.what() << std::endl;
