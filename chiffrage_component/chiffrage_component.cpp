@@ -11,6 +11,7 @@
 #include "cryptopp/hex.h"
 #include "cryptopp/integer.h"
 #include "cryptopp/oids.h"
+#include "cryptopp/files.h"
 #include <iostream>
 
 uint8_t hexchr2bin(const char hex)
@@ -187,14 +188,30 @@ class Chiffrage
    		std::string message= "Floryan est le realisateur du composant"; 
     		/////////////////////////////////////////////////
     		// Part one - generate keys
-    
-    		ECIES<ECP>::Decryptor d0(prng, ASN1::secp256k1());
+    		ECIES<ECP>::PrivateKey privateKey;
+                ECIES<ECP>::PublicKey publicKey;
+
+		
+                // Curve Key Generation
+                privateKey.Initialize( prng, ASN1::secp256k1());
+                privateKey.MakePublicKey(publicKey);
+		const std::string& DecryptorfilePublic = "ECIES_PublicKey.key";
+		SavePublicKey(publicKey,DecryptorfilePublic);
+                
+		ECIES<ECP>::Encryptor e0;
+		LoadPublicKey(e0.AccessPublicKey(),DecryptorfilePublic);
+    		e0.GetPublicKey().ThrowIfInvalid(prng, 3);
+
+                //ECIES<ECP>::Encryptor e0(publicKey);
+                ECIES<ECP>::Decryptor d0(privateKey);
+    		//ECIES<ECP>::Decryptor d0(prng, ASN1::secp256k1());
     		//PrintPrivateKey(d0.GetKey());
 
-    		ECIES<ECP>::Encryptor e0(d0);
+    		//ECIES<ECP>::Encryptor e0(d0);
     		//PrintPublicKey(e0.GetKey());
-    
-    		/////////////////////////////////////////////////
+    		    		
+		
+		/////////////////////////////////////////////////
     		// Part two - encrypt/decrypt with e0/d0
     
     		std::string em0; // encrypted message
@@ -214,6 +231,26 @@ class Chiffrage
     		std::cout << "Decrypted Message : "<< dm0 << std::endl;
 	}
 
+	void SavePrivateKey(const CryptoPP::PrivateKey& key, const std::string& file){
+    		CryptoPP::FileSink sink(file.c_str());
+    		key.Save(sink);
+	}
+
+	void SavePublicKey(const CryptoPP::PublicKey& key, const std::string& file){
+    		CryptoPP::FileSink sink(file.c_str());
+    		key.Save(sink);
+	}
+
+	void LoadPrivateKey(CryptoPP::PrivateKey& key, const std::string& file){
+    		CryptoPP::FileSource source(file.c_str(), true);
+    		key.Load(source);
+	}
+
+	void LoadPublicKey(CryptoPP::PublicKey& key, const std::string& file){
+    		CryptoPP::FileSource source(file.c_str(), true);
+    		key.Load(source);
+	}
+
 };
  
 namespace py = pybind11;
@@ -229,6 +266,10 @@ PYBIND11_MODULE(chiffrage_component,greetings)
         	.def("getPublicKey", &Chiffrage::getPublicKey)
 		.def("encrypt", &Chiffrage::encrypt)
 		.def("encrypt_decrypt2", &Chiffrage::encrypt_decrypt2)
+		.def("LoadPublicKey", &Chiffrage::LoadPublicKey)
+		.def("LoadPrivateKey", &Chiffrage::LoadPrivateKey)
+		.def("SavePublicKey", &Chiffrage::SavePublicKey)
+		.def("SavePriavteKey", &Chiffrage::SavePrivateKey)
 		//.def("PrintPrivateKey",&Chiffrage::PrintPrivateKey)
 		//.def("PrintPublicKey", &Chiffrage::PrintPublicKey)
 		//.def("encrypt_decrypt", &Chiffrage::encrypt_decrypt)
