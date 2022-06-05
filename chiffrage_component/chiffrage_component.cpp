@@ -132,9 +132,18 @@ class Chiffrage
         		encryptor.AccessKey().ThrowIfInvalid(prng, 3);
 
         		// encrypted message
-        		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor, new HexEncoder(new StringSink(encryptedMessage))));
+        		StringSource ss1(message, true, new PK_EncryptorFilter(prng, encryptor,new HexEncoder( new StringSink(encryptedMessage))));
 			std::cout<<"encrypted msg: "<<encryptedMessage<<"  and its length: "<<encryptedMessage.length()<<std::endl;
-    		}
+
+			std::string decryptedMessage;
+			bool valid = decryptor.AccessKey().Validate(prng, 3);
+        		if(!valid){
+           			decryptor.AccessKey().ThrowIfInvalid(prng, 3);
+			}
+        		std::cout << "Exponent is valid for P-256k1" << std::endl;
+			StringSource ss2 (encryptedMessage, true, new PK_DecryptorFilter(prng, decryptor,new StringSink(decryptedMessage)));
+        		std::cout <<"decrypted msg: "<< decryptedMessage<<"  and its length: "<<decryptedMessage.length() << std::endl;
+		}
     		catch(const CryptoPP::Exception& ex){
         		std::cerr << ex.what() << std::endl;
     		}
@@ -190,14 +199,18 @@ class Chiffrage
     
     		std::string em0; // encrypted message
     		StringSource ss1 (message, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0) ) );
+		std::string em0Hex;
+		StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
     		std::string dm0; // decrypted message
     		StringSource ss2 (em0, true, new PK_DecryptorFilter(prng, d0, new StringSink(dm0) ) );
-   		std::cout << "Encrypted Message : ";
-		for (const auto &item : em0) {
-        		std::cout << std::hex << int(item);
-    		} 
-		std::cout<< std::endl;
+   		
     		std::cout << "Encrypted Message : "<<std::hex<< em0 << std::endl;
+		std::cout << "Encrypted Message (std::hex) : ";
+                for (const auto &item : em0) {
+                        std::cout << std::hex << int(item);
+                } 
+                std::cout<< std::endl;
+		std::cout << "Encrypted Message (HexEncoder) : "<< em0Hex << std::endl;
     		std::cout << "Decrypted Message : "<< dm0 << std::endl;
 	}
 
