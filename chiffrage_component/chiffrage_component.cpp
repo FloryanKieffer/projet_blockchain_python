@@ -164,7 +164,7 @@ class Chiffrage
 	void encrypt_decrypt2(){
 		using namespace CryptoPP;
     		AutoSeededRandomPool prng;
-   		std::string message= "Now is the time for all good men to come to the aide of their country."; 
+   		std::string message= "Floryan est le realisateur du composant"; 
     		/////////////////////////////////////////////////
     		// Part one - generate keys
     
@@ -181,8 +181,12 @@ class Chiffrage
     		StringSource ss1 (message, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0) ) );
     		std::string dm0; // decrypted message
     		StringSource ss2 (em0, true, new PK_DecryptorFilter(prng, d0, new StringSink(dm0) ) );
-    
-    		std::cout << "Encrypted Message : "<< em0 << std::endl;
+   		std::cout << "Encrypted Message : ";
+		for (const auto &item : em0) {
+        		std::cout << std::hex << int(item);
+    		} 
+		std::cout<< std::endl;
+    		std::cout << "Encrypted Message : "<<std::hex<< em0 << std::endl;
     		std::cout << "Decrypted Message : "<< dm0 << std::endl;
 	}
 
