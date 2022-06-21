@@ -36,7 +36,7 @@ class Chiffrage
 		using namespace CryptoPP; //Utilisation de la librairie CryptoPP
     		AutoSeededRandomPool prng;
    		std::string message= em;
-		encryptedtext = em;
+		
     		/////////////////////////////////////////////////
     		// Part one - generate keys
     		ECIES<ECP>::PrivateKey privateKey;
@@ -62,6 +62,7 @@ class Chiffrage
     		//PrintPublicKey(e0.GetKey());
 		std::string em0; // encrypted message
     		StringSource ss1 (message, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0) ) );
+		encryptedtext = em0;
 		std::string em0Hex;
 		StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
 		
