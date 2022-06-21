@@ -107,57 +107,6 @@ class Chiffrage
     		CryptoPP::FileSource source(file.c_str(), true);
     		key.Load(source);
 	}
-	
-	void PrintPrivateKey(const DL_PrivateKey_EC<ECP>& key, ostream& out){
-		using namespace CryptoPP;
-		// Group parameters
-		const DL_GroupParameters_EC<ECP>& params = key.GetGroupParameters();
-		// Base precomputation (for public key calculation from private key)
-	        const DL_FixedBasePrecomputation<ECPPoint>& bpc = params.GetBasePrecomputation();
-		// Public Key (just do the exponentiation)
-		const ECPPoint point = bpc.Exponentiate(params.GetGroupPrecomputation(), key.GetPrivateExponent());
-
-		out << "Modulus: " << std::hex << params.GetCurve().GetField().GetModulus() << endl;
-		out << "Cofactor: " << std::hex << params.GetCofactor() << endl;
-
-		out << "Coefficients" << endl;
-		out << "  A: " << std::hex << params.GetCurve().GetA() << endl;
-		out << "  B: " << std::hex << params.GetCurve().GetB() << endl;
-
-		out << "Base Point" << endl;
-		out << "  x: " << std::hex << params.GetSubgroupGenerator().x << endl;
-		out << "  y: " << std::hex << params.GetSubgroupGenerator().y << endl;
-
-		out << "Public Point" << endl;
-		out << "  x: " << std::hex << point.x << endl;
-		out << "  y: " << std::hex << point.y << endl;
-
-		out << "Private Exponent (multiplicand): " << endl;
-		out << "  " << std::hex << key.GetPrivateExponent() << endl;
-	}
-
-	void PrintPublicKey(const DL_PublicKey_EC<ECP>& key, ostream& out){
-		using namespace CryptoPP;
-	    	// Group parameters
-	    	const DL_GroupParameters_EC<ECP>& params = key.GetGroupParameters();
-	    	// Public key
-	    	const ECPPoint& point = key.GetPublicElement();
-
-		    out << "Modulus: " << std::hex << params.GetCurve().GetField().GetModulus() << endl;
-		    out << "Cofactor: " << std::hex << params.GetCofactor() << endl;
-
-		    out << "Coefficients" << endl;
-		    out << "  A: " << std::hex << params.GetCurve().GetA() << endl;
-		    out << "  B: " << std::hex << params.GetCurve().GetB() << endl;
-
-		    out << "Base Point" << endl;
-		    out << "  x: " << std::hex << params.GetSubgroupGenerator().x << endl;
-		    out << "  y: " << std::hex << params.GetSubgroupGenerator().y << endl;
-
-		    out << "Public Point" << endl;
-		    out << "  x: " << std::hex << point.x << endl;
-		    out << "  y: " << std::hex << point.y << endl;
-	}
 
 };
  
@@ -173,7 +122,5 @@ PYBIND11_MODULE(chiffrage_component,greetings)
 		.def("LoadPublicKey", &Chiffrage::LoadPublicKey)
 		.def("LoadPrivateKey", &Chiffrage::LoadPrivateKey)
 		.def("SavePublicKey", &Chiffrage::SavePublicKey)
-		.def("SavePriavteKey", &Chiffrage::SavePrivateKey)
-		.def("PrintPublicKey", &Chiffrage::PrintPublicKey)
-		.def("PrintPrivateKey", &Chiffrage::PrintPrivateKey);
+		.def("SavePriavteKey", &Chiffrage::SavePrivateKey);
 }
