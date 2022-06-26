@@ -42,11 +42,15 @@ class Chiffrage
             	LoadPublicKey(e0.AccessPublicKey(), DecryptorfilePublic);
             	e0.GetPublicKey().ThrowIfInvalid(prng, 3);
 		std::cout <<"#####################################PubicKey#####################################"<<std::endl;
-		PrintPublicKey(e0.GetPublicKey);
+		ECIES<ECP>::PublicKey pubKey;
+		LoadPublicKey(pubKey, DecryptorfilePublic);
+		PrintPublicKey(pubKey);
 		std::cout <<"##################################################################################"<<std::endl;
 		std::cout <<"#################################Encrypted Message################################"<<std::endl;
-            	StringSource ss1(plaintext, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0)));
-            	std::string em0Hex;
+            	std::string em0;
+		StringSource ss1(plaintext, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0)));
+            	encryptedtext = em0;
+		std::string em0Hex;
             	StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
 
             	std::cout << "Plain text Message : " << plaintext << std::endl;
