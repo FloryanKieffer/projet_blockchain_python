@@ -33,7 +33,34 @@ class Chiffrage
 		 return encryptedtext;; 
 	}
 	
-	void encrypt_decrypt(std::string em){
+	void encrypt(std::string em, const std::string& DecryptorfilePublic){
+		using namespace CryptoPP;
+		ECIES <ECP> ::Encryptor e0;
+		AutoSeededRandomPool prng;
+		
+		plaintext = em;
+            	LoadPublicKey(e0.AccessPublicKey(), DecryptorfilePublic);
+            	e0.GetPublicKey().ThrowIfInvalid(prng, 3);
+		std::cout <<"#####################################PubicKey#####################################"<<std::endl;
+		PrintPublicKey(e0.GetPublicKey);
+		std::cout <<"##################################################################################"<<std::endl;
+		std::cout <<"#################################Encrypted Message################################"<<std::endl;
+            	StringSource ss1(plaintext, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0)));
+            	std::string em0Hex;
+            	StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
+
+            	std::cout << "Plain text Message : " << plaintext << std::endl;
+            	std::cout << "Encrypted Message : " << std::hex << em0 << std::endl;
+            	std::cout << "Encrypted Message (std::hex) : ";
+            	for (const auto & item: em0) {
+               		std::cout << std::hex << int(item);
+            	}
+            	std::cout << std::endl;
+           	std::cout << "Encrypted Message (HexEncoder) : " << em0Hex << std::endl;
+		std::cout <<"##################################################################################"<<std::endl;
+	}
+	
+	/*void encrypt_decrypt(std::string em){
 		using namespace CryptoPP; //Utilisation de la librairie CryptoPP
     		AutoSeededRandomPool prng;
    		std::string message= em;
@@ -99,21 +126,11 @@ class Chiffrage
    		plaintext = dm0;
     		
     		std::cout << "Decrypted Message : "<< dm0 << std::endl;
-	}
-
-	void SavePrivateKey(const CryptoPP::PrivateKey& key, const std::string& file){
-    		CryptoPP::FileSink sink(file.c_str());
-    		key.Save(sink);
-	}
+	}*/
 
 	void SavePublicKey(const CryptoPP::PublicKey& key, const std::string& file){
     		CryptoPP::FileSink sink(file.c_str());
     		key.Save(sink);
-	}
-
-	void LoadPrivateKey(CryptoPP::PrivateKey& key, const std::string& file){
-    		CryptoPP::FileSource source(file.c_str(), true);
-    		key.Load(source);
 	}
 
 	void LoadPublicKey(CryptoPP::PublicKey& key, const std::string& file){
@@ -144,34 +161,6 @@ class Chiffrage
     		std::cout << "  x: " << std::hex << point.x << std::endl;
     		std::cout << "  y: " << std::hex << point.y << std::endl;	
 	}
-
-	void PrintPrivateKey(const CryptoPP::DL_PrivateKey_EC<CryptoPP::ECP>& key){
-    		using namespace CryptoPP;
-		// Group parameters
-    		const DL_GroupParameters_EC<ECP>& params = key.GetGroupParameters();
-    		// Base precomputation (for public key calculation from private key)
-    		const DL_FixedBasePrecomputation<ECPPoint>& bpc = params.GetBasePrecomputation();
-    		// Public Key (just do the exponentiation)
-    		const ECPPoint point = bpc.Exponentiate(params.GetGroupPrecomputation(), key.GetPrivateExponent());
-    
-    		std::cout << "Modulus: " << std::hex << params.GetCurve().GetField().GetModulus() << std::endl;
-    		std::cout << "Cofactor: " << std::hex << params.GetCofactor() << std::endl;
-    
-    		std::cout << "Coefficients" << std::endl;
-    		std::cout << "  A: " << std::hex << params.GetCurve().GetA() << std::endl;
-    		std::cout << "  B: " << std::hex << params.GetCurve().GetB() << std::endl;
-    
-    		std::cout << "Base Point" << std::endl;
-    		std::cout << "  x: " << std::hex << params.GetSubgroupGenerator().x << std::endl;
-    		std::cout << "  y: " << std::hex << params.GetSubgroupGenerator().y << std::endl;
-    
-    		std::cout << "Public Point" << std::endl;
-    		std::cout << "  x: " << std::hex << point.x << std::endl;
-    		std::cout << "  y: " << std::hex << point.y << std::endl;
-    
-    		std::cout << "Private Exponent (multiplicand): " << std::endl;
-    		std::cout << "  " << std::hex << key.GetPrivateExponent() << std::endl;
-	}
 };
  
 namespace py = pybind11;
@@ -182,11 +171,10 @@ PYBIND11_MODULE(chiffrage_component,greetings)
   	greetings.doc() = "chiffrage_component 1.0";
     	py::class_<Chiffrage>(greetings, "Chiffrage", py::dynamic_attr())
         	.def(py::init())
-		.def("encrypt_decrypt", &Chiffrage::encrypt_decrypt)
+		.def("getPlaintext", &Chiffrage::getPlaintext)
+		.def("getEncryptedText", &Chiffrage::getEncryptedText)
+		.def("encrypt", &Chiffrage::encrypt)
 		.def("LoadPublicKey", &Chiffrage::LoadPublicKey)
-		.def("LoadPrivateKey", &Chiffrage::LoadPrivateKey)
 		.def("SavePublicKey", &Chiffrage::SavePublicKey)
-		.def("PrintPublicKey", &Chiffrage::PrintPublicKey)
-		.def("PrintPrivateKey", &Chiffrage::PrintPrivateKey)
-		.def("SavePriavteKey", &Chiffrage::SavePrivateKey);
+		.def("PrintPublicKey", &Chiffrage::PrintPublicKey);
 }
