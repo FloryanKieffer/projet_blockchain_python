@@ -16,30 +16,44 @@ Spécification :
 1)	Le composant chiffrage_component utilise deux submodules :
 
 •	CryptoPP qui est une librairie de cryptographie
+
 •	Pybind11 qui permet l’interprétation du code C++ en python
 
 2)	Le composant chiffrage_component est composé :
+
 •	D’un fichier Makefile qui construit le composant
+
 •	D’un fichier chiffrage_component.cpp qui contient le code c++ du composant
+
 •	D’un fichier chiffrage_component.h qui contient les en-têtes des méthodes du composant
+
 •	Des submodules CryptoPP et pybind11
 
 
 3)	La classe Chiffrage est composé de deux attributs de type String :
 
 •	String plaintext message non crypté ou message décrypté
+
 •	String encryptedtext Message encrypté
 
 4)	La classe Chiffrage est composé de 8 Méthodes :
 
 •	Chiffrage() Constructeur
+
 •	~Chiffrage() Desctructeur
+
 •	const std::string &getPlaintext() const  retourne la référence vers le message non crypté/décrypté
+
 •	const std::string &getEncryptedText() const  retourne la reference vers le message encrypté
+
 •	void SavePrivateKey(const CryptoPP::PrivateKey& key, const std::string& file)  Sauve la clé privé passé en paramètre dans un fichier donc le chemin est également passé en paramètre
+
 •	void SavePublicKey(const CryptoPP::PublicKey& key, const std::string& file)  Sauve la clé public passé en paramètre dans un fichier donc le chemin est également passé en paramètre
+
 •	void LoadPrivateKey(CryptoPP::PrivateKey& key, const std::string& file)  Récupère une clé privée dans un fichier dont le chemin est passé en paramètre et la charge dans la clé privée dont la paramètre est passé par référence
+
 •	void LoadPublicKey(CryptoPP::PublicKey& key, const std::string& file)  Récupère une clé publique dans un fichier dont le chemin est passé en paramètre et la charge dans la clé publique dont la paramètre est passé par référence
+
 •	void encrypt_decrypt(std::string em)  Encrypte le message passé en paramètre et le stock dans l’attribut encryptedtext.
 
 Comment fonctionne la méthode principale qui va encrypter le message ?
