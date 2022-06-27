@@ -71,6 +71,7 @@ Une fois le projet cloné :
 9) maintenant tout est prêt il nous fait donc lancer python avec la commande python3
 
 10) Un fois python lancé taper les commandes suivantes :
+
 import chiffrage_component
 
 chiffrage = chiffrage_component.Chiffrage()
