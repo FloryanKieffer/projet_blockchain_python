@@ -20,6 +20,7 @@ class Chiffrage
 	private:
 		std::string plaintext;
 		std::string encryptedtext;
+		std::string encryptedtextBin;
     	public:
         	Chiffrage(){}
         	~Chiffrage(){} 
@@ -31,6 +32,10 @@ class Chiffrage
 
 	const std::string getEncryptedText() const {
 		 return encryptedtext;; 
+	}
+
+	const std::string getEncryptedTextBin()const{
+		return encryptedtextBin;
 	}
 	
 	void encrypt(std::string em, const std::string& DecryptorfilePublic){
@@ -52,14 +57,9 @@ class Chiffrage
                 std::string em0Hex;
                 StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
                 encryptedtext = em0Hex;
-
+		encryptedtextBin = em0;
             	std::cout << "Plain text Message : " << plaintext << std::endl;
-            	std::cout << "Encrypted Message : " << std::hex << em0 << std::endl;
-            	std::cout << "Encrypted Message (std::hex) : ";
-            	for (const auto & item: em0) {
-               		std::cout << std::hex << int(item);
-            	}
-            	std::cout << std::endl;
+            	
            	std::cout << "Encrypted Message (HexEncoder) : " << em0Hex << std::endl;
 		std::cout <<"##################################################################################"<<std::endl;
 	}
@@ -177,6 +177,7 @@ PYBIND11_MODULE(chiffrage_component,greetings)
         	.def(py::init())
 		.def("getPlaintext", &Chiffrage::getPlaintext)
 		.def("getEncryptedText", &Chiffrage::getEncryptedText)
+		.def("getEncryptedTextBin", &Chiffrage::getEncryptedTextBin)
 		.def("encrypt", &Chiffrage::encrypt)
 		.def("LoadPublicKey", &Chiffrage::LoadPublicKey)
 		.def("SavePublicKey", &Chiffrage::SavePublicKey)
