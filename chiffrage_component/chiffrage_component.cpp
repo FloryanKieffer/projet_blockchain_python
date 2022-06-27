@@ -29,7 +29,7 @@ class Chiffrage
 		return plaintext;
 	}
 
-	const std::string &getEncryptedText() const {
+	const std::string getEncryptedText() const {
 		 return encryptedtext;; 
 	}
 	
@@ -49,9 +49,9 @@ class Chiffrage
 		std::cout <<"#################################Encrypted Message################################"<<std::endl;
             	std::string em0;
 		StringSource ss1(plaintext, true, new PK_EncryptorFilter(prng, e0, new StringSink(em0)));
-            	encryptedtext = em0;
-		std::string em0Hex;
-            	StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
+                std::string em0Hex;
+                StringSource ss3(em0, true, new HexEncoder(new StringSink(em0Hex)));
+                encryptedtext = em0Hex;
 
             	std::cout << "Plain text Message : " << plaintext << std::endl;
             	std::cout << "Encrypted Message : " << std::hex << em0 << std::endl;
